@@ -16,16 +16,25 @@ import AuthContext from "../Components/context/AuthContext";
 import axios from "axios";
 import Subdrop from "../Components/subdrop";
 
+const shop = [
+    ["ثبت کالا یا تجیهزات",'/upload-product'],
+];
+
 export default function Header({ children, title, height = 'h-full' }) {
     const { data: session, status } = useSession()
     const [menu, setmenu] = useState(1000);
+    const [selected, setSelected] = useState(null)
+    const [categorysubroot, setcategorysubroot] = useState(null)
+    const [type, settype] = useState(null)
+    const [typeSee, settypeSee] = useState(null)
+    const [subselected, setSubselected] = useState([])
+    const [selectsub, setselectsub] = useState(null)
     const [userdata, setuserdata] = useState([]);
     const [lng, setlng] = useState('')
     const [selectcategory, setselectcategory] = useState('همه دسته بندی ها')
     const togglemenu = () => {
         menu === 0 ? setmenu(1000) : setmenu(0);
     };
-
     const logout = () => {
         toast.loading('از حساب خود خارج شدید');
         localStorage.clear();
@@ -36,15 +45,39 @@ export default function Header({ children, title, height = 'h-full' }) {
         router.push(link);
         togglemenu();
     }
-
+    useEffect(() => {
+        var array = [];
+        var split = plans[0]?.desc?.split('-');
+        split.map(i => {
+            array.push(i.trim())
+        });
+        setSubselected(array);
+    }, [selected])
     useEffect(() => {
         setlng(localStorage.getItem('lng'))
     }, [setlng])
     useEffect(() => {
+        // console.log(router.query.type)
         setuserdata(JSON.parse(localStorage.getItem('datauser')));
     }, [])
 
+    const [showText, setShowText] = useState(false)
 
+    const handleMouseEnter = item => {
+        setShowText(true)
+        if (item.name === 'آکادمی مهندسی') {
+            setSubselected(academy);
+        }
+        if (item.name === 'کالا و تجهیزات') {
+            setSubselected(shop);
+        }
+        if (item.name === 'مهندسان خبره') {
+            setSubselected(engineers);
+        }
+    }
+    const handleMouseLeave = item => {
+        setShowText(false)
+    }
 
 
 
@@ -443,6 +476,90 @@ export default function Header({ children, title, height = 'h-full' }) {
                         <nav className="flex justify-center items-center w-full">
                             <ul className="w-full space-x-7 flex justify-center items-center relative">
                                 <div></div>
+                                <div className="relative">
+                                    <Popover className="relative">
+                                        {({ open }) => (
+                                            <>
+                                                <Popover.Button className={`text-gray-700 hover:text-gray-900 transition duration-150 text-xs font-medium flex justify-center items-center focus:outline-none focus:border-none`}>
+                                                    <span>
+                                                        <svg className="w-4 h-4 text-[#0065FD]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M12.0368 8.46265V15.6111" stroke="CurrentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                            <path d="M15.6148 12.0368H8.45898" stroke="CurrentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                            <path fillRule="evenodd" clipRule="evenodd" d="M2.30005 12.0369C2.30005 4.73479 4.73479 2.30005 12.0369 2.30005C19.339 2.30005 21.7737 4.73479 21.7737 12.0369C21.7737 19.339 19.339 21.7737 12.0369 21.7737C4.73479 21.7737 2.30005 19.339 2.30005 12.0369Z" stroke="CurrentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                        </svg>
+                                                    </span>
+                                                    <span className="mr-1 sans-bolish text-primary">ایجاد و بارگذاری</span>
+                                                </Popover.Button>
+                                                <Transition
+                                                    as={Fragment}
+                                                    enter="transition ease-out duration-200"
+                                                    enterFrom="opacity-0 translate-y-1"
+                                                    enterTo="opacity-100 translate-y-0"
+                                                    leave="transition ease-in duration-150"
+                                                    leaveFrom="opacity-100 translate-y-0"
+                                                    leaveTo="opacity-0 translate-y-1"
+                                                >
+                                                    <Popover.Panel className="absolute right-0 z-10 mt-6 flex justify-center items-start flex-row-reverse px-4 sm:px-0">
+                                                        {showText && (
+                                                            <div onMouseEnter={() => setShowText(true)} className="space-y-1 overflow-hidden w-60 h-72 rounded-l-lg relative shadow bg-white -ml-4 py-5 px-2 ring-1 ring-black ring-opacity-5">
+                                                                {subselected?.map((res, index) => (
+                                                                    <Link key={index} href={`/dashboard/${res[1]}`}>
+                                                                        <p className="flex text-block hover:bg-primary/10 hover:text-primary rounded-lg justify-start sans-bolish items-start flex-col space-y-5 py-3 px-3 text-xs">
+                                                                            {res[0]}
+                                                                        </p>
+                                                                    </Link>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                        <div className="overflow-hidden w-80 h-72 bg-white rounded-r-lg border-l  shadow ring-1 ring-black ring-opacity-5">
+                                                            <div className="relative grid gap-6 bg-white py-5 pr-5 pl-0 lg:grid-cols-1">
+                                                                {plans.map((item, index) => (
+                                                                    <button
+                                                                        key={index}
+                                                                        onMouseEnter={() => handleMouseEnter(item)}
+                                                                        onMouseLeave={() => handleMouseLeave(item)}
+                                                                        // href={'/dashboard/upload?type=' + item.href}
+                                                                        className="-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out
+                                                                         hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 
+                                                                         focus-visible:ring-opacity-50"
+                                                                    >
+                                                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12">
+                                                                            {index == 0 && <IconThree />}
+                                                                            {index == 1 && <IconTwo />}
+                                                                            {index == 2 && <IconOne />}
+                                                                        </div>
+                                                                        <div className="mx-4">
+                                                                            <p className="text-sm sans-bolish text-gray-900">
+                                                                                {item.name}
+                                                                            </p>
+                                                                            {/* <p className="text-xs text-gray-500 mt-1">
+                                                                                {item.desc.split('-')}
+                                                                            </p> */}
+                                                                        </div>
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                            <div className="bg-gray-50 hidden p-4">
+                                                                <Link href="/terms" >
+                                                                    <div className="flow-root rounded-lg px-3 py-3 transition duration-150 ease-in-out hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50">
+                                                                        <span className="flex items-center">
+                                                                            <span className="text-sm sans-bolish text-gray-900">
+                                                                                راهنما و قوانین
+                                                                            </span>
+                                                                        </span>
+                                                                        <span className="block text-[11px] text-gray-500 mt-1">
+                                                                            برای شروع ایجاد و بارگذاری حتما به بخش راهنما و قوانین مقررات سر بزنید
+                                                                        </span>
+                                                                    </div>
+                                                                </Link>
+                                                            </div>
+                                                        </div>
+                                                    </Popover.Panel>
+                                                </Transition>
+                                            </>
+                                        )}
+                                    </Popover>
+                                </div>
                                 <NavItem title={'آکادمی مهندسی'} route="/category">
                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path fillRule="evenodd" clipRule="evenodd" d="M21.0003 6.6738C21.0003 8.7024 19.3551 10.3476 17.3265 10.3476C15.2979 10.3476 13.6536 8.7024 13.6536 6.6738C13.6536 4.6452 15.2979 3 17.3265 3C19.3551 3 21.0003 4.6452 21.0003 6.6738Z" stroke="CurrentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -463,41 +580,6 @@ export default function Header({ children, title, height = 'h-full' }) {
                                         <path fillRule="evenodd" clipRule="evenodd" d="M8.69775 15.3022L10.2718 10.2722L15.3018 8.69824L13.7278 13.7272L8.69775 15.3022Z" stroke="CurrentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 </NavItem>
-                                <div className="relative">
-                                    <Popover>
-                                        <Popover.Button className={`text-gray-700 hover:text-gray-900 transition duration-150 text-xs font-medium flex justify-center items-center focus:outline-none focus:border-none`}>
-                                            <span>
-                                                <svg className="w-4 h-4 text-[#0065FD]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M12.0368 8.46265V15.6111" stroke="CurrentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                    <path d="M15.6148 12.0368H8.45898" stroke="CurrentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                    <path fillRule="evenodd" clipRule="evenodd" d="M2.30005 12.0369C2.30005 4.73479 4.73479 2.30005 12.0369 2.30005C19.339 2.30005 21.7737 4.73479 21.7737 12.0369C21.7737 19.339 19.339 21.7737 12.0369 21.7737C4.73479 21.7737 2.30005 19.339 2.30005 12.0369Z" stroke="CurrentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                            </span>
-                                            <span className="mr-1 sans-bolish text-primary">ایجاد و بارگذاری</span>
-                                        </Popover.Button>
-                                        <Subdrop title={'آکادمی مهندسی'} data={
-                                            {
-                                                'آکادمی مهندسی': [
-                                                    'آکادمی مهندسی',
-                                                    'بارگذاری کالا و تجهیزات',
-                                                    'مهندسان خبره'
-                                                ],
-                                                'مهندسان خبره': [
-                                                    'آکادمی مهندسی',
-                                                    'بارگذاری کالا و تجهیزات',
-                                                    'مهندسان خبره'
-                                                ],
-                                                'کالا و تجهیزات': [
-                                                    'آکادمی مهندسی',
-                                                    'بارگذاری کالا و تجهیزات',
-                                                    'مهندسان خبره'
-                                                ],
-
-                                            }
-                                        } />
-                                    </Popover>
-                                </div>
-
                             </ul>
                         </nav>
                     </section>
@@ -704,3 +786,135 @@ export default function Header({ children, title, height = 'h-full' }) {
         </div>
     )
 }
+
+
+
+
+function IconOne() {
+    return (
+        <svg
+            width="48"
+            height="48"
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <rect width="48" height="48" rx="8" fill="#FFEDD5" />
+            <path
+                d="M24 11L35.2583 17.5V30.5L24 37L12.7417 30.5V17.5L24 11Z"
+                stroke="#FB923C"
+                strokeWidth="2"
+            />
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M16.7417 19.8094V28.1906L24 32.3812L31.2584 28.1906V19.8094L24 15.6188L16.7417 19.8094Z"
+                stroke="#FDBA74"
+                strokeWidth="2"
+            />
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M20.7417 22.1196V25.882L24 27.7632L27.2584 25.882V22.1196L24 20.2384L20.7417 22.1196Z"
+                stroke="#FDBA74"
+                strokeWidth="2"
+            />
+        </svg>
+    )
+}
+
+function IconTwo() {
+    return (
+        <svg
+            width="48"
+            height="48"
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <rect width="48" height="48" rx="8" fill="#FFEDD5" />
+            <path
+                d="M28.0413 20L23.9998 13L19.9585 20M32.0828 27.0001L36.1242 34H28.0415M19.9585 34H11.8755L15.9171 27"
+                stroke="#FB923C"
+                strokeWidth="2"
+            />
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M18.804 30H29.1963L24.0001 21L18.804 30Z"
+                stroke="#FDBA74"
+                strokeWidth="2"
+            />
+        </svg>
+    )
+}
+
+function IconThree() {
+    return (
+        <svg
+            width="48"
+            height="48"
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <rect width="48" height="48" rx="8" fill="#FFEDD5" />
+            <rect x="13" y="32" width="2" height="4" fill="#FDBA74" />
+            <rect x="17" y="28" width="2" height="8" fill="#FDBA74" />
+            <rect x="21" y="24" width="2" height="12" fill="#FDBA74" />
+            <rect x="25" y="20" width="2" height="16" fill="#FDBA74" />
+            <rect x="29" y="16" width="2" height="20" fill="#FB923C" />
+            <rect x="33" y="12" width="2" height="24" fill="#FB923C" />
+        </svg>
+    )
+}
+
+const solutions = [
+    {
+        name: 'Insights',
+        description: 'Measure actions your users take',
+        href: '##',
+        icon: IconOne,
+    },
+    {
+        name: 'Automations',
+        description: 'Create your own targeted content',
+        href: '##',
+        icon: IconTwo,
+    },
+    {
+        name: 'Reports',
+        description: 'Keep track of your growth',
+        href: '##',
+        icon: IconThree,
+    },
+]
+const plans = [
+    {
+        name: 'آکادمی مهندسی',
+        desc: 'ثبت دوره آموزشی - بارگذاری مقاله - ثبت ایده و تجربه - ثبت سوال - بارگذاری فایل',
+        href: 'academy'
+    },
+    {
+        name: 'کالا و تجهیزات',
+        desc: 'ثبت کالا یا تجیهزات',
+        href: 'tools'
+    },
+    {
+        name: 'مهندسان خبره',
+        desc: 'ایجاد پروژه - ایجاد مسابقه',
+        href: 'engineers'
+    },
+]
+
+const academy = [
+    ["ثبت دوره آموزشی",'/upload-course'],
+    [" بارگذاری مقاله",'/upload-course'],
+    ["ثبت ایده و تجربه",'/upload-experince'],
+    ["ثبت سوال",'/upload-question'],
+    ["بارگذاری فایل",'/upload-file']
+]
+const engineers = [
+    ["ایجاد پروژه ",'/add-project'],
+    [" ایجاد مسابقه",'/upload-match']
+];

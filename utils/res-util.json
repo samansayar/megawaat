@@ -1,0 +1,17 @@
+{
+  "link": {
+    "upload": {
+      "course": "/dashboard/upload-course",
+      "experince": "/dashboard/upload-experince",
+      "question": "/dashboard/upload-question",
+      "file": "/dashboard/upload-file",
+      "article": "/dashboard/upload-article",
+      "product": "/dashboard/upload-product"
+    },
+    "sub" : {
+      "terms" : "/terms",
+      "login" : "/login",
+      "profile" : "/profile"
+    }
+  }
+}

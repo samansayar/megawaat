@@ -4,7 +4,7 @@ import Header from '../../Layouts/Header';
 export default function username() {
   return (
     <Header title="پروفایل سامان سیار" height='h-auto'>
-      <div className='lg:pt-32 lg:px-52 mt-10 pb-40 z-40'>
+      <div className='lg:pt-32 pt-10 lg:px-52 mt-10 pb-40 z-40'>
         <div className='grid-basket'>
           {/* Details Profile */}
           <div className='p-6 w-full rounded-lg bg-white lg:col-span-8 shadow-sm'>

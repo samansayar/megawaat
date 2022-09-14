@@ -2,6 +2,8 @@ import { Fragment, useEffect, useState } from 'react'
 import { Listbox, RadioGroup, Transition } from '@headlessui/react'
 import Header from '../../Layouts/Header'
 import Input from '../../Components/Input'
+import { useRouter } from 'next/router'
+import Breadcrumb from '../../Components/Breadcrump'
 
 const plans = [
     {
@@ -44,178 +46,185 @@ export default function Upload() {
     const [typeSee, settypeSee] = useState(null)
     const [loading, setloading] = useState(false)
     const [subselected, setSubselected] = useState([])
-    const [selectsub, setselectsub] = useState(null)
-    // useEffect(() => {
-    //     if (selected?.desc.includes('-')) {
-    //         var split = selected?.desc.split('-');
-    //         console.log(split)
-    //     } else {
-    //         console.log(selected?.desc)
-    //     }
-    // }, [selected])
+    const [selectsub, setselectsub] = useState()
+    const router = useRouter();
     useEffect(() => {
-        console.log(selectsub)
-    }, [selectsub])
+        setselectsub(router.asPath)
+    }, [])
+
     useEffect(() => {
-        var split = selected?.desc?.split('-');
-        setSubselected(split);
+        var array = [];
+        var split = plans[0]?.desc?.split('-');
+        split.map(i => {
+            array.push(i.trim())
+        });
+        setSubselected(array);
     }, [selected])
+
 
     return (
         <Header title={'ایجاد و بارگذاری - مگاوات'}>
             <div className='lg:pt-32 lg:px-52 pt-20 pb-40 z-40 w-full'>
-            
                 <div className="mx-auto lg:px-0 px-6 transition-all duration-200 ease-in-out">
+                    {/* <!-- Breadcrumb --> */}
+                    <Breadcrumb />
                     <div className='lg:text-[45px] text-2xl -z-40 lg:py-8 py-4 text-gray-900 dark:text-textdark'>
                         <span className='sans-bolisher lg:text-[45px] text-2xl'>ایجاد و بارگذاری  </span>
+                    </div>
 
-                    </div>
-                    <div className="mt-8 pb-10">
-                        <RadioGroup value={selected} onChange={setSelected}>
-                            <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
-                            <div className="grid w-full md:grid-cols-3 gap-6">
-                                {plans.map((plan) => (
-                                    <RadioGroup.Option
-                                        key={plan.name}
-                                        value={plan}
-                                        className={({ active, checked }) =>
-                                            `${active ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-primary' : ''}
-                                            ${checked ? 'bg-primary  text-white' : 'bg-white'} relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none border border-gray-300`
-                                        }
-                                    >
-                                        {({ active, checked }) => (
-                                            <>
-                                                <div className="flex w-full items-center justify-between">
-                                                    <div className="flex items-center">
-                                                        <div className="text-sm">
-                                                            <RadioGroup.Label
-                                                                as="p"
-                                                                className={`sans-bolisher  ${checked ? 'text-white' : 'text-gray-800'
-                                                                    }`}
-                                                            >
-                                                                {plan.name}
-                                                            </RadioGroup.Label>
-                                                            <RadioGroup.Description
-                                                                as="span"
-                                                                className={`inline ${checked ? 'text-blue-100' : 'text-gray-500'
-                                                                    }`}
-                                                            >
-                                                                <span className='mt-2 text-[10px] sans-bolish'>
-                                                                    {plan.desc.split('-').slice(0, 3).join('-') + '....'}
-                                                                </span>{' '}
-                                                            </RadioGroup.Description>
-                                                        </div>
-                                                    </div>
-                                                    {checked && (
-                                                        <div className="shrink-0 text-white">
-                                                            <CheckIcon className="h-8 w-8" />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </>
-                                        )}
-                                    </RadioGroup.Option>
-                                ))}
-                            </div>
-                        </RadioGroup>
-                    </div>
-                    {/* Step 2 */}
-                    <div className={`mt-1 transition-all duration-200 ease-in-out  ${selected ? 'block' : 'hidden'}`}>
-                        <div className='lg:text-[45px] text-2xl -z-40 lg:py-8 py-4 text-gray-900 dark:text-textdark'>
-                            <span className='sans-bolisher lg:text-[35px] text-2xl'>زیر شاخه های </span>
-                            {selected ? <span className='lg:text-[30px] text-2xl text-primary sans-bolisher font-black w-full'>{selected.name}</span> : <span className='lg:text-[35px] text-2xl text-gray-600 sans-bolisher font-black w-full'>......</span>}
-                        </div>
-                        <div className={`mt-10 pb-12`}>
-                            <RadioGroup value={selectsub} onChange={setselectsub}>
+
+
+                    {!router.query && (
+                        <div className="mt-8 pb-10">
+                            <RadioGroup value={selected} onChange={setSelected}>
                                 <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
                                 <div className="grid w-full md:grid-cols-3 gap-6">
-                                    {subselected ? (
-                                        <>
-                                            {
-                                                subselected.map((plan, index) => (
-                                                    <RadioGroup.Option
-                                                        key={index}
-                                                        value={plan}
-                                                        className={({ active, checked }) =>
-                                                            `${active ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-primary' : ''}
-                                            ${checked ? 'bg-primary  text-white' : 'bg-white'} relative flex cursor-pointer rounded-lg px-5 py-3 shadow-sm focus:outline-non border border-gray-300`
-                                                        }
-                                                    >
-                                                        {({ active, checked }) => (
-                                                            <>
-                                                                <div className="flex w-full items-center justify-between">
-                                                                    <div className="flex items-center">
-                                                                        <div className="text-sm">
-                                                                            <RadioGroup.Label
-                                                                                as="p"
-                                                                                className={`sans-bolisher py-3  ${checked ? 'text-white' : 'text-gray-800'
-                                                                                    }`}
-                                                                            >
-                                                                                {plan}
-                                                                            </RadioGroup.Label>
-                                                                        </div>
-                                                                    </div>
-                                                                    {checked && (
-                                                                        <div className="shrink-0 text-white">
-                                                                            <CheckIcon className="h-8 w-8" />
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </>
-                                                        )}
-                                                    </RadioGroup.Option>
-                                                ))
-                                            }
-                                        </>
-                                    ) : (
-                                        <>
-                                            <RadioGroup.Option
-                                                key={selected?.name}
-                                                value={selected}
-                                                className={({ active, checked }) =>
-                                                    `${active ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-primary' : ''}
+                                    {plans.map((plan) => (
+                                        <RadioGroup.Option
+                                            key={plan.name}
+                                            value={plan}
+                                            className={({ active, checked }) =>
+                                                `${active ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-primary' : ''}
                                             ${checked ? 'bg-primary  text-white' : 'bg-white'} relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none border border-gray-300`
-                                                }
-                                            >
-                                                {({ active, checked }) => (
-                                                    <>
-                                                        <div className="flex w-full items-center justify-between">
-                                                            <div className="flex items-center">
-                                                                <div className="text-sm">
-                                                                    <RadioGroup.Label
-                                                                        as="p"
-                                                                        className={`sans-bolisher  ${checked ? 'text-white' : 'text-gray-800'
-                                                                            }`}
-                                                                    >
-                                                                        {selected?.name}
-                                                                    </RadioGroup.Label>
-                                                                    <RadioGroup.Description
-                                                                        as="span"
-                                                                        className={`inline ${checked ? 'text-blue-100' : 'text-gray-500'
-                                                                            }`}
-                                                                    >
-                                                                        <span className='mt-2 text-[10px] sans-bolish'>
-                                                                            {selected?.desc}
-                                                                        </span>{' '}
-                                                                    </RadioGroup.Description>
-                                                                </div>
+                                            }
+                                        >
+                                            {({ active, checked }) => (
+                                                <>
+                                                    <div className="flex w-full items-center justify-between">
+                                                        <div className="flex items-center">
+                                                            <div className="text-sm">
+                                                                <RadioGroup.Label
+                                                                    as="p"
+                                                                    className={`sans-bolisher  ${checked ? 'text-white' : 'text-gray-800'
+                                                                        }`}
+                                                                >
+                                                                    {plan.name}
+                                                                </RadioGroup.Label>
+                                                                <RadioGroup.Description
+                                                                    as="span"
+                                                                    className={`inline ${checked ? 'text-blue-100' : 'text-gray-500'
+                                                                        }`}
+                                                                >
+                                                                    <span className='mt-2 text-[10px] sans-bolish'>
+                                                                        {plan.desc.split('-').slice(0, 3).join('-') + '....'}
+                                                                    </span>{' '}
+                                                                </RadioGroup.Description>
                                                             </div>
-                                                            {checked && (
-                                                                <div className="shrink-0 text-white">
-                                                                    <CheckIcon className="h-8 w-8" />
-                                                                </div>
-                                                            )}
                                                         </div>
-                                                    </>
-                                                )}
-                                            </RadioGroup.Option>
-                                        </>
-                                    )}
+                                                        {checked && (
+                                                            <div className="shrink-0 text-white">
+                                                                <CheckIcon className="h-8 w-8" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </RadioGroup.Option>
+                                    ))}
                                 </div>
                             </RadioGroup>
                         </div>
-                    </div>
-                    {selectsub === 'ثبت دوره آموزشی ' && (
+                    )}
+                    {/* Step 2 */}
+                    {!router.query && (
+                        <div className={`mt-1 transition-all duration-200 ease-in-out  ${selected ? 'block' : 'hidden'}`}>
+                            <div className='lg:text-[45px] text-2xl -z-40 lg:py-8 py-4 text-gray-900 dark:text-textdark'>
+                                <span className='sans-bolisher lg:text-[35px] text-2xl'>زیر شاخه های </span>
+                                {selected ? <span className='lg:text-[30px] text-2xl text-primary sans-bolisher font-black w-full'>{selected.name}</span> : <span className='lg:text-[35px] text-2xl text-gray-600 sans-bolisher font-black w-full'>......</span>}
+                            </div>
+                            <div className={`mt-10 pb-12`}>
+                                <RadioGroup value={selectsub} onChange={setselectsub}>
+                                    <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
+                                    <div className="grid w-full md:grid-cols-3 gap-6">
+                                        {subselected ? (
+                                            <>
+                                                {
+                                                    subselected.map((plan, index) => (
+                                                        <RadioGroup.Option
+                                                            key={index}
+                                                            value={plan}
+                                                            className={({ active, checked }) =>
+                                                                `${active ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-primary' : ''}
+                                            ${checked ? 'bg-primary  text-white' : 'bg-white'} relative flex cursor-pointer rounded-lg px-5 py-3 shadow-sm focus:outline-non border border-gray-300`
+                                                            }
+                                                        >
+                                                            {({ active, checked }) => (
+                                                                <>
+                                                                    <div className="flex w-full items-center justify-between">
+                                                                        <div className="flex items-center">
+                                                                            <div className="text-sm">
+                                                                                <RadioGroup.Label
+                                                                                    as="p"
+                                                                                    className={`sans-bolisher py-3  ${checked ? 'text-white' : 'text-gray-800'
+                                                                                        }`}
+                                                                                >
+                                                                                    {plan}
+                                                                                </RadioGroup.Label>
+                                                                            </div>
+                                                                        </div>
+                                                                        {checked && (
+                                                                            <div className="shrink-0 text-white">
+                                                                                <CheckIcon className="h-8 w-8" />
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </RadioGroup.Option>
+                                                    ))
+                                                }
+                                            </>
+                                        ) : (
+                                            <>
+                                                <RadioGroup.Option
+                                                    key={selected?.name}
+                                                    value={selected}
+                                                    className={({ active, checked }) =>
+                                                        `${active ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-primary' : ''}
+                                            ${checked ? 'bg-primary  text-white' : 'bg-white'} relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none border border-gray-300`
+                                                    }
+                                                >
+                                                    {({ active, checked }) => (
+                                                        <>
+                                                            <div className="flex w-full items-center justify-between">
+                                                                <div className="flex items-center">
+                                                                    <div className="text-sm">
+                                                                        <RadioGroup.Label
+                                                                            as="p"
+                                                                            className={`sans-bolisher  ${checked ? 'text-white' : 'text-gray-800'
+                                                                                }`}
+                                                                        >
+                                                                            {selected?.name}
+                                                                        </RadioGroup.Label>
+                                                                        <RadioGroup.Description
+                                                                            as="span"
+                                                                            className={`inline ${checked ? 'text-blue-100' : 'text-gray-500'
+                                                                                }`}
+                                                                        >
+                                                                            <span className='mt-2 text-[10px] sans-bolish'>
+                                                                                {selected?.desc}
+                                                                            </span>{' '}
+                                                                        </RadioGroup.Description>
+                                                                    </div>
+                                                                </div>
+                                                                {checked && (
+                                                                    <div className="shrink-0 text-white">
+                                                                        <CheckIcon className="h-8 w-8" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </RadioGroup.Option>
+                                            </>
+                                        )}
+                                    </div>
+                                </RadioGroup>
+                            </div>
+                        </div>
+                    )}
+
+                    {selectsub == 'ثبت دوره آموزشی' || selectsub === '/dashboard/upload?type=1' && (
                         <div className={`pt-5 mt-5 border-t border-gray-300 pb-12`}>
                             <div className="w-full">
                                 <div className="grid lg:grid-cols-2 gap-4 relative w-full">
@@ -387,9 +396,8 @@ export default function Upload() {
                                 </div>
                             </div>
                         </div>
-
                     )}
-                    {selectsub === ' بارگذاری مقاله ' && (
+                    {selectsub === 'بارگذاری مقاله' || selectsub === '/dashboard/upload?type=2' && (
                         <div className={`pt-5 mt-5 border-t border-gray-300 pb-12`}>
                             <div className="w-full">
                                 <div className="block relative w-full">
@@ -557,9 +565,8 @@ export default function Upload() {
                                 </div>
                             </div>
                         </div>
-
                     )}
-                    {selectsub === ' ثبت ایده و تجربه ' && (
+                    {selectsub === 'ثبت ایده و تجربه' || selectsub === '/dashboard/upload?type=3' && (
                         <div className={`pt-5 mt-5 border-t border-gray-300 pb-12`}>
                             <div className="w-full">
                                 <div className="block relative w-full">
@@ -635,9 +642,8 @@ export default function Upload() {
                                 </div>
                             </div>
                         </div>
-
                     )}
-                    {selectsub === ' ثبت سوال ' && (
+                    {selectsub === 'ثبت سوال' || selectsub === '/dashboard/upload?type=4' && (
                         <div className={`pt-5 mt-5 border-t border-gray-300 pb-12`}>
                             <div className="w-full">
                                 <div className="block relative w-full">
@@ -713,7 +719,6 @@ export default function Upload() {
                                 </div>
                             </div>
                         </div>
-
                     )}
                 </div>
             </div>
